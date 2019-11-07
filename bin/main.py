@@ -1,14 +1,13 @@
 import pygame
 
-import settings
-import colors
+import settings as s
 
 from classes import Game, Snake, Message, Score
 
 pygame.init()
 pygame.display.set_caption('Snake')
 
-gameDisplay = pygame.display.set_mode((settings.display_width, settings.display_height + settings.footer_height))
+gameDisplay = pygame.display.set_mode((s.display_width, s.display_height + s.footer_height))
 gameClock = pygame.time.Clock()
 
 
@@ -35,7 +34,7 @@ while not crashed:
             elif event.key == pygame.K_UP:
                 snake.up()
 
-    gameDisplay.fill(colors.white)
+    gameDisplay.fill(s.white)
     next_coordinates = snake.get_head_coordinates()
 
     if game.check_field(next_coordinates) and next_coordinates not in snake.get_body_coordinates():
@@ -45,11 +44,11 @@ while not crashed:
             game.fruit = None
         else:
             snake.move()
-        score.draw(gameDisplay)
         game.draw()
     else:
         Message('You Lost !!').draw(gameDisplay)
 
+    score.draw(gameDisplay)
 
     pygame.display.update()
     gameClock.tick(60)

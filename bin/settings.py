@@ -13,3 +13,9 @@ display_width = block_size * game_width
 display_height = block_size * game_height
 
 image_directory = "../src/images/"
+
+
+# Predefined colors
+black = (0,0,0)
+white = (255,255,255)
+

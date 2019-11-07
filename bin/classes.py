@@ -1,9 +1,10 @@
-import images
-import settings
-import colors
+import settings as s
 import random
 
+from pathlib import Path
+from pygame import image
 from pygame.font import Font
+
 
 class ImageWrapper():
     image_object = None
@@ -25,24 +26,24 @@ class Field(ImageWrapper):
 
 class Block(Field):
     solid = True
-    image_object = images.block_image
+    image_object = image.load(str(Path(s.image_directory + 'block.png')))
 
 
 class Ground(Field):
     solid = False
-    image_object = images.ground_image
+    image_object = image.load(str(Path(s.image_directory + 'ground.png')))
 
 
 class Fruit(ImageWrapper):
-    image_object = images.pineapple_image
+    image_object = image.load(str(Path(s.image_directory + 'pineapple.png')))
 
     def __init__(self,display):
-        x = random.randrange(1,settings.game_width-1)
-        y = random.randrange(1,settings.game_height-1)
+        x = random.randrange(1,s.game_width-1)
+        y = random.randrange(1,s.game_height-1)
         super().__init__(
             display,
-            x*settings.block_size,
-            y*settings.block_size
+            x*s.block_size,
+            y*s.block_size
         )
         self.map_x = x
         self.map_y = y
@@ -50,11 +51,11 @@ class Fruit(ImageWrapper):
 
 class SnakeSegment(ImageWrapper):
     head = False
-    image_object = images.snake_image
+    image_object = image.load(str(Path(s.image_directory + 'snake.png')))
     direction = None  # up / down / right / left
 
     def __init__(self,display,x,y,direction='down',head=False,):
-        super().__init__(display,x*settings.block_size,y*settings.block_size,)
+        super().__init__(display,x*s.block_size,y*s.block_size,)
         self.direction = direction
         self.head = head
         self.map_x = x
@@ -65,8 +66,8 @@ class SnakeSegment(ImageWrapper):
         super().draw()
 
     def update_coordinates(self):
-        self.map_x = self.x // settings.block_size
-        self.map_y = self.y // settings.block_size
+        self.map_x = self.x // s.block_size
+        self.map_y = self.y // s.block_size
 
     def get_coordinates(self):
         return (self.map_x,self.map_y)
@@ -84,10 +85,10 @@ class Snake():
     }
 
     move_change = {
-        "down": (0,1*settings.block_size),
-        "up": (0,-1*settings.block_size),
-        "right": (1*settings.block_size,0),
-        "left": (-1*settings.block_size,0),
+        "down": (0,1*s.block_size),
+        "up": (0,-1*s.block_size),
+        "right": (1*s.block_size,0),
+        "left": (-1*s.block_size,0),
     }
 
     def __init__(self):
@@ -126,7 +127,7 @@ class Snake():
             self.change["direction"] = "up"
 
     def check_move(self):
-        return not self.move_count % settings.block_size and not self.move_count == 0
+        return not self.move_count % s.block_size and not self.move_count == 0
 
     def move(self):
         # only move if move count is multiple of block_size to slow things down
@@ -167,8 +168,8 @@ class Snake():
             direction = self.change['direction']
         else:
             direction = self.fields[0].direction
-        x = self.fields[0].map_x + Snake.move_change[direction][0] // settings.block_size
-        y = self.fields[0].map_y + Snake.move_change[direction][1] // settings.block_size
+        x = self.fields[0].map_x + Snake.move_change[direction][0] // s.block_size
+        y = self.fields[0].map_y + Snake.move_change[direction][1] // s.block_size
         return x, y
 
     def get_body_coordinates(self):
@@ -183,31 +184,31 @@ class Map():
         self.pattern.append([
             Block(
                 self.display,
-                settings.block_size*x,
-                settings.block_size*0
-            ) for x in range(0,settings.game_width)
+                s.block_size*x,
+                s.block_size*0
+            ) for x in range(0,s.game_width)
         ])
 
-        for y in range(1, settings.game_height-1):
+        for y in range(1, s.game_height-1):
             row = []
             # Add first of row
             row.append(Block(
                 self.display,
-                settings.block_size*0,
-                settings.block_size*y
+                s.block_size*0,
+                s.block_size*y
             ))
             # Add fields between the edge blocks
-            for x in range(1, settings.game_width-1):
+            for x in range(1, s.game_width-1):
                 row.append(Ground(
                     self.display,
-                    settings.block_size*x,
-                    settings.block_size*y,
+                    s.block_size*x,
+                    s.block_size*y,
                 ))
             # Add last block of row
             row.append(Block(
                 self.display,
-                settings.block_size*(settings.game_width-1),
-                settings.block_size*y
+                s.block_size*(s.game_width-1),
+                s.block_size*y
             ))
             # Finally add row to pattern
             self.pattern.append(row)
@@ -215,9 +216,9 @@ class Map():
         self.pattern.append([
             Block(
                 self.display,
-                settings.block_size*x,
-                settings.block_size*(settings.game_height-1)
-            ) for x in range(0,settings.game_width)
+                s.block_size*x,
+                s.block_size*(s.game_height-1)
+            ) for x in range(0,s.game_width)
         ])
 
 
@@ -260,12 +261,12 @@ class Message():
 
     def __init__(self,message):
         self.message = message
-        self.font = Font('freesansbold.ttf',90)
+        self.font = Font('freesansbold.ttf',50)
 
     def draw(self,display):
-        text_surface = self.font.render(self.message, True, colors.black)
+        text_surface = self.font.render(self.message, True, s.black)
         text_rect = text_surface.get_rect()
-        text_rect.center = ((settings.display_width/2),(settings.display_height/2))
+        text_rect.center = ((s.display_width/2),(s.display_height/2))
         display.blit(text_surface, text_rect)
 
 
@@ -277,9 +278,9 @@ class Score():
         self.font = Font('freesansbold.ttf',12)
 
     def draw(self,display):
-        text_surface = self.font.render(self.text.format(self.score), True, colors.black)
+        text_surface = self.font.render(self.text.format(self.score), True, s.black)
         text_rect = text_surface.get_rect()
-        text_rect.center = (settings.block_size*2,settings.display_height+settings.block_size/2)
+        text_rect.center = (s.block_size*2,s.display_height+s.block_size/2)
         display.blit(text_surface, text_rect)
 
     def count(self):
